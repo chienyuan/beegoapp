@@ -1,23 +1,22 @@
-FROM library/golang
+FROM golang:1.14-alpine AS build
 
-# Godep for vendoring
-RUN go get github.com/tools/godep
+# Install tools required for beegoapp
+# Run `docker build --no-cache .` to update dependencies
+RUN apk add --no-cache git
 
-# Recompile the standard library without CGO
-RUN CGO_ENABLED=0 go install -a std
+# List beegoapp dependencies with Gopkg.toml and Gopkg.lock
+# These layers are only re-built when Gopkg files are updated
+WORKDIR /go/src/beegoapp/
 
-ENV APP_DIR $GOPATH/src/github.com/chienyuan/beegoapp
-RUN mkdir -p $APP_DIR
+# Copy the entire beegoapp and build it
+# This layer is rebuilt when a file changes in the beegoapp directory
+COPY . /go/src/beegoapp/
+RUN  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo -ldflags '-w -extldflags "-static"' -o beegoapp
 
-# Set the entrypoint
-ENTRYPOINT (cd $APP_DIR && ./beegoapp)
-ADD . $APP_DIR
+# This results in a single layer image
+FROM scratch
+COPY --from=build /go/src/beegoapp/ /beegoapp/
+WORKDIR /beegoapp
+ENTRYPOINT ["/beegoapp/beegoapp"]
+CMD ["--help"]
 
-# Compile the binary and statically link
-RUN cd $APP_DIR && CGO_ENABLED=0 godep go build -ldflags '-d -w -s'
-#RUn go get github.com/astaxie/beego
-#RUN cd $APP_DIR && CGO_ENABLED=0 go build -ldflags '-d -w -s'
-WORKDIR $APP_DIR
-#CGO_ENABLED=0 GOOS=linux GOARCH=amd64  go build -a -tags netgo -ldflags '-w -extldflags "-static"'  -o beegoapp
-
-EXPOSE 8080
