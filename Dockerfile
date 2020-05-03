@@ -14,9 +14,9 @@ ENTRYPOINT (cd $APP_DIR && ./beegoapp)
 ADD . $APP_DIR
 
 # Compile the binary and statically link
-#RUN cd $APP_DIR && CGO_ENABLED=0 godep go build -ldflags '-d -w -s'
-RUn go get github.com/astaxie/beego
-RUN cd $APP_DIR && CGO_ENABLED=0 go build -ldflags '-d -w -s'
+RUN cd $APP_DIR && CGO_ENABLED=0 godep go build -ldflags '-d -w -s'
+#RUn go get github.com/astaxie/beego
+#RUN cd $APP_DIR && CGO_ENABLED=0 go build -ldflags '-d -w -s'
 WORKDIR $APP_DIR
 #CGO_ENABLED=0 GOOS=linux GOARCH=amd64  go build -a -tags netgo -ldflags '-w -extldflags "-static"'  -o beegoapp
 

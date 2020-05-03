@@ -19,6 +19,8 @@ bee run
 beegoapp
 
 
+godep save
+docker build --no-cache -t chienyuan/beegoapp .
 docker build -t chienyuan/beegoapp .
 docker images chienyuan/beegoapp
 docker push chienyuan/beegoapp
