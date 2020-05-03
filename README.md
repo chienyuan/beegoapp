@@ -23,7 +23,7 @@ docker build -t chienyuan/beegoapp .
 docker images chienyuan/beegoapp
 docker push chienyuan/beegoapp
 
-docker run -p 8080:8080 chienyuan/beegoapp
+docker run --rm -p 8080:8080 chienyuan/beegoapp
 
 
 ```
